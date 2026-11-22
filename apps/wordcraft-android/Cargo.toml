@@ -41,5 +41,5 @@ config_changes = "orientation|keyboardHidden|keyboard|screenSize|smallestScreenS
 
 # Assina com a chave de debug que o workflow cria; serve para instalar no seu aparelho.
 [package.metadata.android.signing.release]
-path = "../../../.android/debug.keystore"
+path = "../../debug.keystore"
 keystore_password = "android"
