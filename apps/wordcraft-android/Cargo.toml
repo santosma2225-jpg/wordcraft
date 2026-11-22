@@ -1,0 +1,45 @@
+[package]
+name = "wordcraft-android"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish = false
+description = "WordCraft for Android: the same word processor, started by Android's NativeActivity"
+
+# Sem `[lints] workspace = true` de propósito: o ponto de entrada do Android precisa de `unsafe`,
+# que o workspace proíbe.
+
+[lib]
+crate-type = ["cdylib"]
+
+# Tudo só no Android: em outras plataformas este crate fica vazio e não atrapalha o resto.
+[target.'cfg(target_os = "android")'.dependencies]
+wordcraft-engine = { workspace = true }
+wordcraft-ui-egui = { workspace = true }
+eframe = { workspace = true, features = ["default_fonts", "wgpu", "android-native-activity"] }
+egui = { workspace = true }
+craft = { workspace = true, features = ["ui", "ui-app", "window"] }
+winit = { version = "0.30", default-features = false, features = ["android-native-activity"] }
+log = { workspace = true }
+android_logger = "0.15"
+
+[package.metadata.android]
+package = "io.github.santosma2225.wordcraft"
+apk_name = "wordcraft"
+build_targets = ["aarch64-linux-android"]
+
+[package.metadata.android.sdk]
+min_sdk_version = 26
+target_sdk_version = 34
+
+[package.metadata.android.application]
+label = "WordCraft"
+
+# Teclado, mouse e redimensionamento de janela (DeX) não devem reiniciar o app.
+[package.metadata.android.application.activity]
+config_changes = "orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|screenLayout|density|uiMode|navigation"
+
+# Assina com a chave de debug que o workflow cria; serve para instalar no seu aparelho.
+[package.metadata.android.signing.release]
+path = "$HOME/.android/debug.keystore"
+keystore_password = "android"
