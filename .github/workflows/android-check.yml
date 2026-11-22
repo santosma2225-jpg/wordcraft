@@ -1,0 +1,50 @@
+name: android-check
+
+# Teste de viabilidade: tenta compilar cada crate do WordCraft para Android (arm64).
+# Rode manualmente em Actions > android-check > Run workflow.
+# Cada crate roda em um job separado, então um erro não esconde os outros.
+
+on:
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        crate:
+          - wordcraft-geom
+          - wordcraft-doc
+          - wordcraft-fonts
+          - wordcraft-layout
+          - wordcraft-docx
+          - wordcraft-formats
+          - wordcraft-render
+          - wordcraft-pdf
+          - wordcraft-engine
+          - wordcraft-ui-egui
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-linux-android
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          key: android-${{ matrix.crate }}
+
+      - name: Instalar cargo-ndk
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-ndk
+
+      - name: Mostrar NDK e versões
+        run: |
+          echo "ANDROID_NDK_HOME=$ANDROID_NDK_HOME"
+          rustc --version
+          cargo --version
+
+      - name: Compilar ${{ matrix.crate }} para Android arm64
+        run: cargo ndk -t arm64-v8a check -p ${{ matrix.crate }}
